@@ -1,0 +1,23 @@
+<html lang="en">
+<head>
+    
+</head>
+<body>
+    
+    <p id="cool">no</p>
+    <div>
+        <textarea id="qq" type="text" placeholder="留言⋯⋯" value=""></textarea>
+    </div>
+    <script>
+        function init() {
+            document.getElementById('qq').addEventListener("keypress", (e) => {
+            console.log(e);
+            if (e.key === "Enter") {
+                document.getElementById("cool").innerHTML = "YES"
+            }
+        })
+        }
+        init()
+    </script>
+</body>
+</html>
