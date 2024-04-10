@@ -4,14 +4,22 @@ const sleep = require('./utils/sleep.js')
 // 可標記的帳號
 const accounts = require('./temp/accounts.js')
 
-// 一次需要標記人數
-const counts = 2
+// 每次需要標記人數
+const counts = prompt('每次需要標記的人數：')
 
 /** 自動留言處理函式
  * @type { function(page): Promise<void> }
  * @param { puppeteer.Page } page
  */
 const messageHandler = async (page) => {
+  function getRandomSleepTime() {
+    const min = 180000
+    const max = 600000
+    const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min
+    console.log(`下次留言等待時間為${randomNumber}毫秒`)
+    return randomNumber
+  }
+  await page.screenshot({ path: '進入貼文.png' })
   console.log('已開始自動留言....')
   let ori_accounts = [...accounts]
   let removed
@@ -22,12 +30,13 @@ const messageHandler = async (page) => {
       messageString += `@${removed[i]} `
     }
     await page.focus('textarea[placeholder=留言⋯⋯]')
-    await page.keyboard.type(`${messageString}測試`)
+    await page.keyboard.type(`${messageString}買安全帽找海爾`, { delay: 100 })
     await page.keyboard.press('Enter')
-    console.log(`已留言 "${messageString}測試"`)
+    await page.screenshot({ path: '每次留言的截圖.png' })
+    console.log(`已留言 "${messageString}買安全帽找海爾"`)
     // 需要檢查是否已不夠標記，避免白等時間
     if (ori_accounts.length < counts) break
-    await sleep(60000)
+    await sleep(getRandomSleepTime())
   }
   console.log('可標記帳號不足，結束自動留言....')
 }
@@ -43,9 +52,11 @@ const start = async () => {
 
   // 輸入帳號密碼
   await page.focus('input[name=username]')
-  await page.keyboard.type('yhes914310@gmail.com')
+  const account = prompt('輸入帳號：')
+  await page.keyboard.type(account)
   await page.focus('input[name=password]')
-  await page.keyboard.type('wilbur825882')
+  const password = prompt('輸入密碼：')
+  await page.keyboard.type(password)
   await page.screenshot({ path: '輸入帳號密碼.png' })
 
   // 按下登入
@@ -53,6 +64,7 @@ const start = async () => {
   await sleep(15000)
 
   // 輸入備用簡訊驗證碼並送出
+  let needVerify = true
   const buttons = await page.$$('button')
   for (let button of buttons) {
     const buttonContent = await page.evaluate((el) => el.textContent, button)
@@ -60,14 +72,18 @@ const start = async () => {
       await button.click()
       await page.screenshot({ path: '進入到輸入備用驗證碼畫面.png' })
       break
+    } else {
+      needVerify = false
     }
   }
-  const verificationCode = prompt('輸入備用驗證碼：')
-  await page.focus('input[name=verificationCode]')
-  await page.keyboard.type(verificationCode)
-  await page.$eval('button[type=button]', (button) => button.click())
-  await page.screenshot({ path: '備用驗證碼送出.png' })
-  await sleep(15000)
+  if (needVerify) {
+    const verificationCode = prompt('輸入備用驗證碼：')
+    await page.focus('input[name=verificationCode]')
+    await page.keyboard.type(verificationCode)
+    await page.$eval('button[type=button]', (button) => button.click())
+    await page.screenshot({ path: '備用驗證碼送出.png' })
+    await sleep(15000)
+  }
 
   let postUrl = ''
   while (postUrl !== 'q') {

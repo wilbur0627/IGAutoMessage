@@ -1,6 +1,10 @@
 const sleep = require('../utils/sleep.js')
 const prompt = require('prompt-sync')()
 
+const a = prompt('你好', '哈哈')
+
+console.log(a)
+
 // const inputHandler = async () => {
 //   let nextText = ''
 //   const endCondition = 3
@@ -18,14 +22,14 @@ const prompt = require('prompt-sync')()
 // }
 // inputHandler()
 
-const takeArrayHandler = (counts) => {
-  const a = [1, 2, 3, 4, 5, 6, 7]
-  let ori = [...a]
-  let removed = []
-  while (ori.length >= counts) {
-    removed = ori.splice(0, counts)
-    console.log(removed)
-  }
-}
+// const takeArrayHandler = (counts) => {
+//   const a = [1, 2, 3, 4, 5, 6, 7]
+//   let ori = [...a]
+//   let removed = []
+//   while (ori.length >= counts) {
+//     removed = ori.splice(0, counts)
+//     console.log(removed)
+//   }
+// }
 
-takeArrayHandler(2)
+// takeArrayHandler(2)
